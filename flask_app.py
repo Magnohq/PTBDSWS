@@ -1,34 +1,49 @@
-from flask import Flask, redirect, request, make_response, abort
+# flask_app.py
+from flask import Flask, request, url_for
 
 app = Flask(__name__)
 
-@app.route('/user/<nome>')
-def saudar(nome):
-    return f'<h1>Hello, {nome}!</h1>'
+#Home
+@app.route("/")
+def home():
+    return f"""
+    <h1>Avaliação contínua: Aula 030</h1>
+    <ul>
+        <li><a href="{url_for('home')}">Home</a></li>
+        <li><a href="{url_for('identificacao', nome='Henrique Magno', prontuario='PT3031969', instituicao='IFSP')}">Identificação</a></li>
+        <li><a href="{url_for('contexto_requisicao')}">Contexto da requisição</a></li>
+    </ul>
+    """
 
-@app.route('/redirecionamento')
-def redirecionar():
-    return redirect('https://ptb.ifsp.edu.br/')
+#Identificação
+@app.route("/user/<nome>/<prontuario>/<instituicao>")
+def identificacao(nome, prontuario, instituicao):
+    return f"""
+    <h1>Avaliação contínua: Aula 030</h1>
 
-@app.route('/contextorequisicao')
-def contexto():
-    agente = request.headers.get('User-agent')
-    return f'<p>Your browser is {agente}</p>'
+    <h2><b>Aluno:</b> {nome}</h2>
+    <h2><b>Prontuário:</b> {prontuario}</h2>
+    <h2><b>Instituição:</b> {instituicao}</h2>
 
-@app.route('/')
-def inicio():
-    return '<h1>Hello world!</h1> <h2>Disciplina PTBDSWS</h2>'
+    <p><a href="{url_for('home')}">Voltar</a></p>
+    """
 
-@app.route('/objetoresposta')
-def criar_cookie():
-    resposta = make_response("<h1>This document carries a cookie!</h1>")
-    resposta.set_cookie('answer', '42')
-    return resposta
+#Contexto da requisição
+@app.route("/contextorequisicao")
+def contexto_requisicao():
+    user_agent = request.headers.get("User-Agent", "desconhecido")
+    remote_ip  = request.remote_addr or "desconhecido"
+    host       = request.host
 
-@app.route('/abortar')
-def dar_erro():
-    abort(404)
+    return f"""
+    <h1>Avaliação contínua: Aula 030</h1>
 
-@app.route('/codigostatusdiferente')
-def status_custom():
-    return ("Forbidden", 403)
+    <h2><b>Seu navegador é:</b> {user_agent}</h2>
+    <h2><b>O IP do computador remoto é:</b> {remote_ip}</h2>
+    <h2><b>O host da aplicação é:</b> {host}</h2>
+
+    <p><a href="{url_for('home')}">Voltar</a></p>
+    """
+
+if __name__ == "__main__":
+    app.run(debug=True)
